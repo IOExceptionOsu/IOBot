@@ -2,6 +2,8 @@
   "dependencies": {
     "async": "^1.5.0",
     "queue-async": "^1.0.7",
+    "soundrain": "0.0.2",
+    "soundscrape": "^0.2.3",
     "youtube-api": "^1.4.0",
     "youtube-node": "^1.3.0"
   }

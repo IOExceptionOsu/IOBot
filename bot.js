@@ -9,10 +9,10 @@ const storage = require("lowdb/file-sync");
 var request = require("request");
 var randomstring = require("randomstring");
 var YouTube = require("youtube-node");
+
 var youTube = new YouTube();
 youTube.setKey(process.env.YOUTUBE_APIKEY);
-
-const db = low('db.json', { storage });
+const db = low('db.json', { storage: storage });
 var bot = new DiscordClient({
 	email: "iobot@mailinator.com",
 	password: process.env.PASSWORD,
