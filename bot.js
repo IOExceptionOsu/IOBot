@@ -30,10 +30,12 @@ bot.on("ready", function() {
 var queue = [ ];
 var queueFile = "queue.dat";
 
-var queueFileStats = fs.statSync(queueFile);
-if (queueFileStats.isFile()) {
-	queue = JSON.parse(fs.readFileSync(queueFile, 'utf8'));
-}
+try {
+	var queueFileStats = fs.statSync(queueFile);
+	if (queueFileStats.isFile()) {
+		queue = JSON.parse(fs.readFileSync(queueFile, 'utf8'));
+	}
+} catch (e) { }
 
 var stopped = false;
 var cleanup_and_exit = function() {
@@ -56,39 +58,46 @@ var downloadMp3 = function(url, filename, callback) {
 		var timestamp = Math.round( time[ 0 ] * 1e3 + time[ 1 ] / 1e6 );
 		var u1 = "http://www.youtube-mp3.org/a/pushItem/?item=" + escape(url) + "&el=na&bf=false&r=" + timestamp;
 		u1 = sig_url(u1);
-		// console.log(u1);
+		console.log("URL(1): " + u1);
 		request(u1, function(error, response, body) {
 			var id = body;
 			time = process.hrtime();
 			timestamp = Math.round( time[ 0 ] * 1e3 + time[ 1 ] / 1e6 );
 			var u2 = "http://www.youtube-mp3.org/a/itemInfo/?video_id=" + id + "&ac=www&t=grp&r=" + timestamp;
 			u2 = sig_url(u2);
-			// console.log(u2);
+			console.log("URL(2): " + u2);
 			request(u2, function(error2, response2, body2) {
-				var info = JSON.parse(body2.replace("info = ", "").replace("};", "}"));
-				// console.log(info);
-				var file = fs.createWriteStream(filename);
-				var u3 = "http://www.youtube-mp3.org/get?video_id=" + id + "&ts_create=" + info["ts_create"] + "&r=" + encodeURIComponent(info["r"]) + "&h2=" + info["h2"];
-				u3 = sig_url(u3);
-				file.on("close", function() {
-					console.log("Done downloading to " + filename);
-					// queue.push(filename);
-					// names.push(info["title"]);
-					var image = info["image"];
-					var imageFile = "downloads/" + randomstring.generate(15) + ".jpg";
-					var file2 = fs.createWriteStream(imageFile);
-					info["imageFile"] = imageFile;
-					file2.on("close", function() {
-						callback(info);
+				if (body2.indexOf("undefined") >= 0 || body2.indexOf("ERROR") >= 0) {
+					console.log(error2 + "\t" + JSON.stringify(response2));
+					callback("failed");
+				} else {
+					var info = JSON.parse(body2.replace("info = ", "").replace("};", "}"));
+					// console.log(info);
+					var file = fs.createWriteStream(filename);
+					var u3 = "http://www.youtube-mp3.org/get?video_id=" + id + "&ts_create=" + info["ts_create"] + "&r=" + encodeURIComponent(info["r"]) + "&h2=" + info["h2"];
+					u3 = sig_url(u3);
+					console.log("URL(3): " + u3);
+					file.on("close", function() {
+						console.log("Done downloading to " + filename);
+						// queue.push(filename);
+						// names.push(info["title"]);
+						var image = info["image"];
+						var imageFile = "downloads/" + randomstring.generate(15) + ".jpg";
+						var file2 = fs.createWriteStream(imageFile);
+						info["imageFile"] = imageFile;
+						file2.on("close", function() {
+							callback(info);
+						});
+						request(image).pipe(file2);
 					});
-					request(image).pipe(file2);
-				});
-				request(u3).pipe(file); 
+					request(u3).pipe(file); 
+				}
 			});
 		});
 	} catch (e) {
 		console.log(e);
 		console.log("something fucked up");
+		callback("failed");
 	}
 }
 
@@ -233,12 +242,16 @@ var exeQueuete = function() {
 			console.log(queue.length == 0 ? "Nothing there!" : "Found a URL!")
 			if (queue.length != 0) {
 				var url = queue.shift();
+				if (url == undefined) {
+					return exeQueuete();
+				}
 				console.log("url: " + url);
 				(function(callback) {
 					var entry = db("songs").find({ url: url });
 					if (entry == undefined) {
 						var filename = "downloads/" + randomstring.generate(15) + ".mp3";
 						downloadMp3(url, filename, function(info) {
+							if (info === "failed") { return exeQueuete(); }
 							entry = {
 								url: url,
 								file: filename,
