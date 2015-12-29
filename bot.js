@@ -69,8 +69,8 @@ var prevChannel;
 
 bot.on("message", function(user, userID, channelID, message, rawEvent) {
 	console.log(user + " (" + userID + ") #" + channelID + ": " + message);
-	prevChannel = channelID;
 	if (message.startsWith(">")) {
+		prevChannel = channelID;
 		var command = message.substring(1).toLowerCase().split(" ")[0];
 		switch(command) {
 			case "join":
