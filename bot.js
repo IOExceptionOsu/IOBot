@@ -164,19 +164,21 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 			})(0);
 		});
 	}
-	var cleverbot_reply = function(query) {
+	var cleverbot_reply = function(query, prefix) {
+		var prefix = prefix || "<@" + userID + ">";
 		cleverbot.create(function (err, session) {
 			cleverbot.ask(query, function (err, response) {
 				if (err) { console.log(err); return; }
 				console.log(response);
-				bot.sendMessage({ to: channelID, message: "<@" + userID + "> " + response });
+				bot.sendMessage({ to: channelID, message: prefix + " " + response });
 			});
 		});
 	}
 	console.log(user + " (" + userID + ") #" + channelID + ": " + message);
 	if (~~(userID) == 131226420784529408) {
+		console.log("DETECTED KOI MESSAGE!");
 		if (Math.random() > 0.8) {
-			cleverbot_reply(message);
+			cleverbot_reply(message, "!cleverbot");
 		}
 	} else if (message.startsWith(">")) {
 		prevChannel = channelID;
