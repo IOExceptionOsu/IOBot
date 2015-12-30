@@ -193,26 +193,6 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				add_url_to_queue(url);
 				bot.sendMessage({ to: channelID, message: "That video has been queued!" });
 				break;
-			case "ytplaylist":
-				var id = message.substring(11).trim();
-				if (id.length < 1) {
-					return bot.sendMessage({ to: channelID, message: "GIVE ME A GODDAMN PLAYLIST ID" });
-				} else {
-					request("https://www.googleapis.com/youtube/v3/playlistItems?key=" + process.env.YOUTUBE_APIKEY + "&part=contentDetails&playlistId=" + id + "&maxResults=25", function(error, response, body) {
-						var result = JSON.parse(body)["items"];
-						(function next(i) {
-							if (i == result.length) {
-								show_queue();
-								return;
-							} else {
-								add_url_to_queue("https://youtu.be/" + result[i]["contentDetails"]["videoI"], function() {
-									next(i + 1);
-								});
-							}
-						})(0);
-					});
-				}
-				break;
 			case "ytsearch":
 				var query = message.substring(9).trim();
 				youTube.search(query, 10, function(error, result) {
@@ -291,6 +271,26 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 			case "cb":
 				var query = message.substring(command.length + 1);
 				cleverbot_reply(query);
+				break;
+			case "ytplaylist":
+				var id = message.substring(11).trim();
+				if (id.length < 1) {
+					return bot.sendMessage({ to: channelID, message: "GIVE ME A GODDAMN PLAYLIST ID" });
+				} else {
+					request("https://www.googleapis.com/youtube/v3/playlistItems?key=" + process.env.YOUTUBE_APIKEY + "&part=contentDetails&playlistId=" + id + "&maxResults=25", function(error, response, body) {
+						var result = JSON.parse(body)["items"];
+						(function next(i) {
+							if (i == result.length) {
+								show_queue();
+								return;
+							} else {
+								add_url_to_queue("https://youtu.be/" + result[i]["contentDetails"]["videoI"], function() {
+									next(i + 1);
+								});
+							}
+						})(0);
+					});
+				}
 				break;
 			default:
 				bot.sendMessage({ to: channelID, message: "Hey there! I'm the computer version of IOException. Type `>help` to see what I can do!" });
