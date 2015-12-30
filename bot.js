@@ -135,6 +135,9 @@ var add_url_to_queue = function(url) {
 
 bot.on("message", function(user, userID, channelID, message, rawEvent) {
 	var show_queue = function() {
+		if (queue.length == 0) {
+			return bot.sendMessage({ to: channelID, message: "There are no songs in the queue!" });
+		}
 		bot.sendMessage({ to: channelID, message: "The songs in the queue:" }, function() {
 			var currentQueue = JSON.parse(JSON.stringify(queue));
 			(function next(i) {
@@ -243,6 +246,10 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 						bot.joinVoiceChannel(_chan);
 					});
 				}
+				break;
+			case "clearqueue":
+				queue = [ ];
+				break;
 			default:
 				bot.sendMessage({ to: channelID, message: "Hey there! I'm the computer version of IOException. Type `>help` to see what I can do!" });
 				break;
