@@ -278,6 +278,11 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 	} else {
 		if (message.indexOf("<@131453254017089536>") == 0) {
 			var query = message.split("<@131453254017089536>")[1].trim();
+			if (query.toLowerCase() == "hi") {
+				if (Math.random() > 0.8) {
+					return bot.sendMessage({ to: channelID, message: "FUCK YOU. I HOPE YOU DIE IN A HOLE." });
+				}
+			}
 			cleverbot_reply(query);
 		}
 	}
