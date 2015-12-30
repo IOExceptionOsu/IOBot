@@ -289,7 +289,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 								show_queue();
 								return;
 							} else {
-								add_url_to_queue("https://youtu.be/" + result[i]["contentDetails"]["videoI"], function() {
+								add_url_to_queue("https://youtu.be/" + result[i]["contentDetails"]["videoId"], function() {
 									next(i + 1);
 								});
 							}
