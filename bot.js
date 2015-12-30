@@ -124,10 +124,14 @@ var add_url_to_queue = function(url) {
 	var id = get_id_from_url(url);
 	request("https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&key=" + process.env.YOUTUBE_APIKEY + "&id=" + id, function(error, response, body) {
 		var result = JSON.parse(body)["items"][0];
+		var title = result["snippet"]["title"];
+		if (result == undefined) {
+			title = url;
+		}
 		queue.push({
 			url: url,
 			votes: [ ],
-			title: result["snippet"]["title"],
+			title: title,
 			timeAdded: new Date().getTime()
 		});
 	});
