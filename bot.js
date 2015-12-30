@@ -259,16 +259,19 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 });
 
 function join(channelID, message) {
-	if (chan) {
-		bot.leaveVoiceChannel(chan);
-	}
-	
 	var channel = message.substring(message.indexOf(" ") + 1);
 	var server = bot.serverFromChannel(channelID);
 	var channels = bot.servers[server].channels;
 
 	Object.keys(channels).forEach(function(key) {
 		if(channels[key].name === channel){
+			if (chan) {
+				if (channels[key].id != chan) {
+					bot.leaveVoiceChannel(chan);
+				} else {
+					return;
+				}
+			}
 			bot.joinVoiceChannel(channels[key].id, function(){
 				console.log("joined" + channels[key].id);
 				chan = channels[key].id;
