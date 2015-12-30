@@ -217,9 +217,6 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				break;
 		}
 	} else {
-		if (message.find("osu.ppy.sh/b") >= 0) {
-			
-		}
 	}
 });
 
