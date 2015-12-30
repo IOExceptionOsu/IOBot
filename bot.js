@@ -158,6 +158,15 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 			})(0);
 		});
 	}
+	var cleverbot_reply = function(query) {
+		cleverbot.create(function (err, session) {
+			cleverbot.ask(query, function (err, response) {
+				if (err) { console.log(err); return; }
+				console.log(response);
+				bot.sendMessage({ to: channelID, message: "@" + user + ": " + response });
+			});
+		});
+	}
 	console.log(user + " (" + userID + ") #" + channelID + ": " + message);
 	if (message.startsWith(">")) {
 		prevChannel = channelID;
@@ -260,19 +269,17 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 			case "cleverbot":
 			case "cb":
 				var query = message.substring(command.length + 1);
-				cleverbot.create(function (err, session) {
-					cleverbot.ask(query, function (err, response) {
-						if (err) { console.log(err); return; }
-						console.log(response);
-						bot.sendMessage({ to: channelID, message: "@" + user + ": " + response });
-					});
-				});
+				cleverbot_reply(query);
 				break;
 			default:
 				bot.sendMessage({ to: channelID, message: "Hey there! I'm the computer version of IOException. Type `>help` to see what I can do!" });
 				break;
 		}
 	} else {
+		if (message.indexOf("<@131453254017089536>") == 0) {
+			var query = message.split("<@131453254017089536>")[1].trim();
+			cleverbot_reply(query);
+		}
 	}
 });
 
