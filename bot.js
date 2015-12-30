@@ -391,10 +391,13 @@ var exeQueuete = function() {
 		}
 	} else {
 		try {
+			if (Math.random() > 0.95) {
+				bot.sendMessage({ to: prevChannel, message: "!cleverbot What's up?" });
+			}
 			clean_downloads_folder();
 			sort_queue();
 			console.log("Checking the queue...");
-			console.log(queue.length == 0 ? "Nothing there!" : "Found a URL!")
+			console.log(queue.length == 0 ? "Nothing there!" : "Found a URL!");
 			if (queue.length != 0) {
 				var next = queue.shift();
 				var url = next["url"];
