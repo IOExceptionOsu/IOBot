@@ -5,6 +5,7 @@ var async = require("async");
 var fs = require("fs");
 var queue_async = require("queue-async");
 const low = require("lowdb");
+var Cleverbot = require("cleverbot.io");
 const storage = require("lowdb/file-sync");
 var request = require("request");
 var randomstring = require("randomstring");
@@ -12,6 +13,8 @@ var YouTube = require("youtube-node");
 
 var youTube = new YouTube();
 youTube.setKey(process.env.YOUTUBE_APIKEY);
+var cleverbot = new Cleverbot(process.env.CLEVERBOT_APIUSER, process.env.CLEVERBOT_APIKEY);
+cleverbot.setNick("IOBot");
 const db = low('db.json', { storage: storage });
 var bot = new DiscordClient({
 	email: "iobot@mailinator.com",
@@ -253,6 +256,15 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				break;
 			case "clearqueue":
 				queue = [ ];
+				break;
+			case "cleverbot":
+			case "cb":
+				var query = message.substring(command.length + 1);
+				cleverbot.create(function (err, session) {
+					cleverbot.ask(query, function (err, response) {
+						bot.sendMessage({ to: channelID, message: "@" });
+					});
+				});
 				break;
 			default:
 				bot.sendMessage({ to: channelID, message: "Hey there! I'm the computer version of IOException. Type `>help` to see what I can do!" });
