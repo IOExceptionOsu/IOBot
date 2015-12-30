@@ -195,7 +195,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				break;
 			case "ytplaylist":
 				var id = message.substring(11).trim();
-				request("https://www.googleapis.com/youtube/v3/playlistItems?key=" + process.env.YOUTUBE_APIKEY + "&part=contentDetails&playlistId=" + id + "&maxResults=50", function(error, response, body) {
+				request("https://www.googleapis.com/youtube/v3/playlistItems?key=" + process.env.YOUTUBE_APIKEY + "&part=contentDetails&playlistId=" + id + "&maxResults=25", function(error, response, body) {
 					var result = JSON.parse(body)["items"];
 					(function next(i) {
 						if (i == result.length) {
