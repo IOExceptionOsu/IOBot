@@ -157,7 +157,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				join(channelID, message);
 				break;
 			case "help":
-				bot.sendMessage({ to: channelID, message: "Available commands are: help, playsearch, youtube, ytsearch." });
+				bot.sendMessage({ to: channelID, message: "Available commands are: help, playsearch, skipsong, youtube, ytsearch." });
 				break;
 			case "youtube":
 				var url = message.substring(8).trim();
@@ -236,6 +236,13 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 					bot.sendMessage({ to: channelID, message: e.toString() });
 				}
 				break;
+			case "skipsong":
+				if (chan) {
+					var _chan = chan.substring(0);
+					bot.leaveVoiceChannel(chan, function() {
+						bot.joinVoiceChannel(_chan);
+					});
+				}
 			default:
 				bot.sendMessage({ to: channelID, message: "Hey there! I'm the computer version of IOException. Type `>help` to see what I can do!" });
 				break;
