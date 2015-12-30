@@ -364,16 +364,24 @@ var exeQueuete = function() {
 					bot.sendMessage({ to: prevChannel, message: "Now playing: " + next["title"] });
 					bot.uploadFile({ channel: prevChannel, file: fs.createReadStream(entry["meta"]["imageFile"]) });
 					console.log(entry["file"]);
-					bot.testAudio({ channel: chan , stereo: true }, function(stream) {
-						stream.once("fileEnd", function() {
-							if (!stopped) {
-								setTimeout(function() {
-									exeQueuete();
-								}, 2000);
-							}
+					try {
+						bot.testAudio({ channel: chan , stereo: true }, function(stream) {
+							stream.once("fileEnd", function() {
+								if (!stopped) {
+									setTimeout(function() {
+										exeQueuete();
+									}, 2000);
+								}
+							});
+							stream.playAudioFile(entry["file"]);
 						});
-						stream.playAudioFile(entry["file"]);
-					});
+					} catch (e) {
+						if (!stopped) {
+							setTimeout(function() {
+								exeQueuete();
+							}, 2000);
+						}
+					}
 				});
 			} else {
 				// wait 2 seconds and try again
