@@ -177,7 +177,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 	console.log(user + " (" + userID + ") #" + channelID + ": " + message);
 	if (userID.toString() == "131226420784529408") {
 		console.log("DETECTED KOI MESSAGE!");
-		if (Math.random() > 0.8) {
+		if (Math.random() > 0.5) {
 			console.log(">RESPONDING TO KOI...");
 			cleverbot_reply(message, "!cleverbot");
 		}
