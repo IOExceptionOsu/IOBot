@@ -291,7 +291,8 @@ var exeQueuete = function() {
 			console.log("Checking the queue...");
 			console.log(queue.length == 0 ? "Nothing there!" : "Found a URL!")
 			if (queue.length != 0) {
-				var url = queue.shift();
+				var next = queue.shift();
+				var url = next["url"];
 				if (url == undefined) {
 					return exeQueuete();
 				}
