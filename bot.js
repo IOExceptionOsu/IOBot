@@ -174,7 +174,11 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 		});
 	}
 	console.log(user + " (" + userID + ") #" + channelID + ": " + message);
-	if (message.startsWith(">")) {
+	if (~~(userID) == 131226420784529408) {
+		if (Math.random() > 0.8) {
+			cleverbot_reply(message);
+		}
+	} else if (message.startsWith(">")) {
 		prevChannel = channelID;
 		var command = message.substring(1).toLowerCase().split(" ")[0];
 		switch(command) {
