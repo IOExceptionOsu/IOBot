@@ -114,6 +114,24 @@ var currentSong;
 var prevChannel;
 var lastSearch;
 
+function get_id_from_url(url){
+	var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+	var match = url.match(regExp);
+	return (match&&match[7].length==11)? match[7] : false;
+}
+
+var add_url_to_queue = function(url) {
+	var id = get_id_from_url(url);
+	request("https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&key=" + process.env.YOUTUBE_APIKEY + "&id=" + id, function(error, response, body) {
+		var result = JSON.parse(body);
+		queue.add({
+			url: url,
+			votes: [ ],
+			title: result["title"]
+		});
+	});
+};
+
 bot.on("message", function(user, userID, channelID, message, rawEvent) {
 	console.log(user + " (" + userID + ") #" + channelID + ": " + message);
 	if (message.startsWith(">")) {
@@ -137,7 +155,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 					bot.sendMessage({ to: channelID, message: "HOW THE F DO YOU EXPECT ME TO PLAY THIS" });
 					break;
 				}
-				queue.push(url);
+				add_url_to_queue(url);
 				bot.sendMessage({ to: channelID, message: "That video has been queued!" });
 				break;
 			case "ytsearch":
@@ -171,7 +189,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 					var N = parseInt(message.substring(11).trim());
 					if (N >= 0 && N < 10) {
 						console.log(lastSearch[N]);
-						queue.push(lastSearch[N]["url"]);
+						add_url_to_queue(lastSearch[N]["url"]);
 						bot.sendMessage({ to: channelID, message: "'" + lastSearch[N]["title"] + "' has been queued!" });
 					} else {
 						throw Error();
@@ -188,7 +206,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 							// bot.sendMessage({ to: channelID, message: "" });
 							return;
 						}
-						bot.sendMessage({ to: channelID, message: " [" + (i + 1) + "]\t" + currentQueue[i] }, function() {
+						bot.sendMessage({ to: channelID, message: " [" + (i + 1) + "]\t" + currentQueue[i]["title"] }, function() {
 							next(i + 1);
 						});
 					})(0);
@@ -198,10 +216,18 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				bot.sendMessage({ to: channelID, message: "Hey there! I'm the computer version of IOException. Type `>help` to see what I can do!" });
 				break;
 		}
+	} else {
+		if (message.find("osu.ppy.sh/b") >= 0) {
+			
+		}
 	}
 });
 
 function join(channelID, message) {
+	if (chan) {
+		bot.leaveVoiceChannel(chan);
+	}
+	
 	var channel = message.substring(message.indexOf(" ") + 1);
 	var server = bot.serverFromChannel(channelID);
 	var channels = bot.servers[server].channels;
@@ -209,7 +235,7 @@ function join(channelID, message) {
 	Object.keys(channels).forEach(function(key) {
 		if(channels[key].name === channel){
 			bot.joinVoiceChannel(channels[key].id, function(){
-				console.log("joined");
+				console.log("joined" + channels[key].id);
 				chan = channels[key].id;
 			});
 		}
@@ -247,6 +273,12 @@ var clean_downloads_folder = function() {
 	}
 };
 
+var sort_queue = function() {
+	queue.sort(function(a, b) {
+		return a["votes"].length - b["votes"].length;
+	});
+};
+
 var exeQueuete = function() {
 	if (!chan || chan.length < 1) {
 		console.log("No voice channel.");
@@ -258,6 +290,7 @@ var exeQueuete = function() {
 	} else {
 		try {
 			clean_downloads_folder();
+			sort_queue();
 			console.log("Checking the queue...");
 			console.log(queue.length == 0 ? "Nothing there!" : "Found a URL!")
 			if (queue.length != 0) {
