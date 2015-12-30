@@ -226,6 +226,8 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 						} else {
 							queue[N]["votes"].push(user);
 							bot.sendMessage({ to: channelID, message: "Vote sent. Current voters: " + queue[N].votes.join(", ") });
+							sort_queue();
+							show_queue();
 						}
 					} else {
 						throw Error("CHOOSE A GODDAMN NUMBER IN THE LIST");
