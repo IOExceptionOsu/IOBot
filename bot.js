@@ -142,7 +142,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 					// bot.sendMessage({ to: channelID, message: "" });
 					return;
 				}
-				bot.sendMessage({ to: channelID, message: " [" + (i + 1) + "]\t" + currentQueue[i]["title"] }, function() {
+				bot.sendMessage({ to: channelID, message: " [" + (i + 1) + "]\t" + currentQueue[i]["title"] + "\t(" + currentQueue[i]["votes"].length + " votes)" }, function() {
 					next(i + 1);
 				});
 			})(0);
@@ -192,7 +192,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 								title: item["snippet"]["title"]
 							}; 
 							searchItems.push(obj);
-							bot.sendMessage({ to: channelID, message: " [" + i + "]\t" + obj["title"] + "\t(" + obj["votes"].length + " votes)" }, function() {
+							bot.sendMessage({ to: channelID, message: " [" + i + "]\t" + obj["title"] }, function() {
 								next(i + 1);
 							});
 						})(0);
@@ -232,6 +232,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				} catch(e) {
 					bot.sendMessage({ to: channelID, message: e.toString() });
 				}
+				break;
 			default:
 				bot.sendMessage({ to: channelID, message: "Hey there! I'm the computer version of IOException. Type `>help` to see what I can do!" });
 				break;
