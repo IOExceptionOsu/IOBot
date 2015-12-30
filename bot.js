@@ -262,7 +262,9 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				var query = message.substring(command.length + 1);
 				cleverbot.create(function (err, session) {
 					cleverbot.ask(query, function (err, response) {
-						bot.sendMessage({ to: channelID, message: "@" });
+						if (err) { console.log(err); return; }
+						console.log(response);
+						bot.sendMessage({ to: channelID, message: "@" + user + ": " + response });
 					});
 				});
 				break;
