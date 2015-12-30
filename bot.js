@@ -220,6 +220,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				try {
 					var N = parseInt(message.substring(5).trim());
 					if (N > 0 && N <= queue.length) {
+						N -= 1;
 						if (queue[N]["votes"].indexOf(user) >= 0) {
 							throw Error("YOU ALREADY VOTED FOR THIS");
 						} else {
@@ -293,7 +294,7 @@ var clean_downloads_folder = function() {
 
 var sort_queue = function() {
 	queue.sort(function(a, b) {
-		if (a == b) return a["timestamp"] - b["timestamp"];
+		if (a["votes"] == b["votes"]) return a["timestamp"] - b["timestamp"];
 		return -(a["votes"].length - b["votes"].length);
 	});
 };
