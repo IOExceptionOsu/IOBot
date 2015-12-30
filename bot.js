@@ -151,14 +151,14 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 		if (queue.length == 0) {
 			return bot.sendMessage({ to: channelID, message: "There are no songs in the queue!" });
 		}
-		bot.sendMessage({ to: channelID, message: "The songs in the queue:" }, function() {
+		bot.sendMessage({ to: channelID, message: "<@" + userID + "> I'm sending you the song queue in private message!" }, function() {
 			var currentQueue = JSON.parse(JSON.stringify(queue));
 			(function next(i) {
 				if (i == currentQueue.length) {
 					// bot.sendMessage({ to: channelID, message: "" });
 					return;
 				}
-				bot.sendMessage({ to: channelID, message: " [" + (i + 1) + "]\t" + currentQueue[i]["title"] + "\t(" + currentQueue[i]["votes"].length + " votes)" }, function() {
+				bot.sendMessage({ to: userID, message: " [" + (i + 1) + "]\t" + currentQueue[i]["title"] + "\t(" + currentQueue[i]["votes"].length + " votes)" }, function() {
 					next(i + 1);
 				});
 			})(0);
