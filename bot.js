@@ -181,7 +181,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 					var i = 0;
 					bot.sendMessage({ to: channelID, message: "Results for '" + query + "' (" + result["pageInfo"]["totalResults"] + "):" }, function() {
 						(function next(i) {
-							if (i == 10) {
+							if (i == Math.min(result["pageInfo"]["totalResults"], 10)) {
 								lastSearch = searchItems;
 								bot.sendMessage({ to: channelID, message: "To play one of the above videos, type `>playsearch <number>`" });
 								return;
