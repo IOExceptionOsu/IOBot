@@ -124,6 +124,7 @@ function get_id_from_url(url){
 }
 
 var add_url_to_queue = function(url, callback) {
+	console.log("Adding " + url + " to queue...");
 	var id = get_id_from_url(url);
 	request("https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&key=" + process.env.YOUTUBE_APIKEY + "&id=" + id, function(error, response, body) {
 		if (JSON.parse(body).items && JSON.parse(body)["items"].length > 0) {
