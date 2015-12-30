@@ -340,7 +340,7 @@ var exeQueuete = function() {
 						callback(entry);
 					}
 				})(function(entry) {
-					bot.sendMessage({ to: prevChannel, message: "Now playing: " + entry["meta"]["title"] });
+					bot.sendMessage({ to: prevChannel, message: "Now playing: " + next["title"] });
 					bot.uploadFile({ channel: prevChannel, file: fs.createReadStream(entry["meta"]["imageFile"]) });
 					console.log(entry["file"]);
 					bot.testAudio({ channel: chan , stereo: true }, function(stream) {
