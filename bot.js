@@ -123,16 +123,31 @@ function get_id_from_url(url){
 var add_url_to_queue = function(url) {
 	var id = get_id_from_url(url);
 	request("https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&key=" + process.env.YOUTUBE_APIKEY + "&id=" + id, function(error, response, body) {
-		var result = JSON.parse(body);
+		var result = JSON.parse(body)["items"][0];
 		queue.push({
 			url: url,
 			votes: [ ],
-			title: result["title"]
+			title: result["snippet"]["title"],
+			timeAdded: new Date().getTime()
 		});
 	});
 };
 
 bot.on("message", function(user, userID, channelID, message, rawEvent) {
+	var show_queue = function() {
+		bot.sendMessage({ to: channelID, message: "The songs in the queue:" }, function() {
+			var currentQueue = JSON.parse(JSON.stringify(queue));
+			(function next(i) {
+				if (i == currentQueue.length) {
+					// bot.sendMessage({ to: channelID, message: "" });
+					return;
+				}
+				bot.sendMessage({ to: channelID, message: " [" + (i + 1) + "]\t" + currentQueue[i]["title"] }, function() {
+					next(i + 1);
+				});
+			})(0);
+		});
+	}
 	console.log(user + " (" + userID + ") #" + channelID + ": " + message);
 	if (message.startsWith(">")) {
 		prevChannel = channelID;
@@ -177,7 +192,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 								title: item["snippet"]["title"]
 							}; 
 							searchItems.push(obj);
-							bot.sendMessage({ to: channelID, message: " [" + i + "]\t" + obj["title"] }, function() {
+							bot.sendMessage({ to: channelID, message: " [" + i + "]\t" + obj["title"] + "\t(" + obj["votes"].length + " votes)" }, function() {
 								next(i + 1);
 							});
 						})(0);
@@ -199,19 +214,24 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				}
 				break;
 			case "showqueue":
-				bot.sendMessage({ to: channelID, message: "The songs in the queue:" }, function() {
-					var currentQueue = JSON.parse(JSON.stringify(queue));
-					(function next(i) {
-						if (i == currentQueue.length) {
-							// bot.sendMessage({ to: channelID, message: "" });
-							return;
-						}
-						bot.sendMessage({ to: channelID, message: " [" + (i + 1) + "]\t" + currentQueue[i]["title"] }, function() {
-							next(i + 1);
-						});
-					})(0);
-				});
+				show_queue();
 				break;
+			case "vote":
+				try {
+					var N = parseInt(message.substring(5).trim());
+					if (N > 0 && N <= queue.length) {
+						if (queue[N]["votes"].indexOf(user) >= 0) {
+							throw Error("YOU ALREADY VOTED FOR THIS");
+						} else {
+							queue[N]["votes"].push(user);
+							bot.sendMessage({ to: channelID, message: "Vote sent. Current voters: " + queue[N].votes.join(", ") });
+						}
+					} else {
+						throw Error("CHOOSE A GODDAMN NUMBER IN THE LIST");
+					}
+				} catch(e) {
+					bot.sendMessage({ to: channelID, message: e.toString() });
+				}
 			default:
 				bot.sendMessage({ to: channelID, message: "Hey there! I'm the computer version of IOException. Type `>help` to see what I can do!" });
 				break;
@@ -272,7 +292,8 @@ var clean_downloads_folder = function() {
 
 var sort_queue = function() {
 	queue.sort(function(a, b) {
-		return a["votes"].length - b["votes"].length;
+		if (a == b) return a["timestamp"] - b["timestamp"];
+		return -(a["votes"].length - b["votes"].length);
 	});
 };
 
