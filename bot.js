@@ -163,7 +163,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 			cleverbot.ask(query, function (err, response) {
 				if (err) { console.log(err); return; }
 				console.log(response);
-				bot.sendMessage({ to: channelID, message: "@" + user + ": " + response });
+				bot.sendMessage({ to: channelID, message: "<@" + userID + "> " + response });
 			});
 		});
 	}
