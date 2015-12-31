@@ -2,6 +2,8 @@
 
 Discord bot.
 
+### IMPORTANT NOTICE: IOBot will be rewritten in the near future to make it easier to install and hopefully more modular.
+
 ## Installation
 
 1. Make sure node/npm is installed. Go to the project directory and `npm install`.
