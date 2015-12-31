@@ -139,8 +139,8 @@ var add_url_to_queue = function(url, callback) {
 				title: title,
 				timeAdded: new Date().getTime()
 			});
-			callback();
-		} else {
+		}
+		if (callback) {
 			callback();
 		}
 	});
