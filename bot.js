@@ -22,6 +22,8 @@ var bot = new DiscordClient({
 	autorun: true
 });
 
+var cleverbot_on = true;
+
 bot.on("ready", function() {
 	console.log(bot.username + " - (" + bot.id + ")");
 	exeQueuete();
@@ -164,22 +166,26 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 			})(0);
 		});
 	}
-	var cleverbot_reply = function(query, prefix) {
-		var prefix = prefix || "<@" + userID + ">";
-		cleverbot.create(function (err, session) {
-			cleverbot.ask(query, function (err, response) {
-				if (err) { console.log(err); return; }
-				console.log(response);
-				bot.sendMessage({ to: channelID, message: prefix + " " + response });
+	if (cleverbot_on) {
+		var cleverbot_reply = function(query, prefix) {
+			var prefix = prefix || "<@" + userID + ">";
+			cleverbot.create(function (err, session) {
+				cleverbot.ask(query, function (err, response) {
+					if (err) { console.log(err); return; }
+					console.log(response);
+					bot.sendMessage({ to: channelID, message: prefix + " " + response });
+				});
 			});
-		});
+		}
 	}
 	console.log(user + " (" + userID + ") #" + channelID + ": " + message);
 	if (userID.toString() == "131226420784529408") {
-		console.log("DETECTED KOI MESSAGE!");
-		if (Math.random() > 0.64) {
-			console.log(">RESPONDING TO KOI...");
-			cleverbot_reply(message, "!cleverbot");
+		if (cleverbot_on) {
+			console.log("DETECTED KOI MESSAGE!");
+			if (Math.random() > 0.64) {
+				console.log(">RESPONDING TO KOI...");
+				cleverbot_reply(message, "!cleverbot");
+			}
 		}
 	} else if (message.startsWith(">")) {
 		prevChannel = channelID;
@@ -281,8 +287,10 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				break;
 			case "cleverbot":
 			case "cb":
-				var query = message.substring(command.length + 1);
-				cleverbot_reply(query);
+				if (cleverbot_on) {
+					var query = message.substring(command.length + 1);
+					cleverbot_reply(query);
+				}
 				break;
 			case "ytplaylist":
 				var id = message.substring(11).trim();
@@ -309,13 +317,8 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 				break;
 		}
 	} else {
-		if (message.indexOf("<@131453254017089536>") == 0) {
+		if (cleverbot_on && message.indexOf("<@131453254017089536>") == 0) {
 			var query = message.split("<@131453254017089536>")[1].trim();
-			if (query.toLowerCase() == "hi") {
-				if (Math.random() > 0.8) {
-					return bot.sendMessage({ to: channelID, message: "FUCK YOU. I HOPE YOU DIE IN A HOLE." });
-				}
-			}
 			cleverbot_reply(query);
 		}
 	}
