@@ -177,7 +177,7 @@ bot.on("message", function(user, userID, channelID, message, rawEvent) {
 	console.log(user + " (" + userID + ") #" + channelID + ": " + message);
 	if (userID.toString() == "131226420784529408") {
 		console.log("DETECTED KOI MESSAGE!");
-		if (Math.random() > 0.5) {
+		if (Math.random() > 0.64) {
 			console.log(">RESPONDING TO KOI...");
 			cleverbot_reply(message, "!cleverbot");
 		}
@@ -391,9 +391,6 @@ var exeQueuete = function() {
 		}
 	} else {
 		try {
-			if (Math.random() > 0.95) {
-				bot.sendMessage({ to: prevChannel, message: "!cleverbot What's up?" });
-			}
 			clean_downloads_folder();
 			sort_queue();
 			console.log("Checking the queue...");
